@@ -103,27 +103,30 @@ def load_data(plot_params: dict) -> tuple:
         )
         plot_params["csv_file_path_std"] = None
     elif plot_params["spanwise_CFD"]:
-        csv_file_path = (
-            Path(project_dir)
-            / "processed_data"
-            / "CFD_slices"
-            / f"spanwise_slices"
-            / f"alpha_{int(alpha)}_CFD_spanwise_slice_50cm_1.csv"
+        raise NotImplementedError(
+            "Spanwise CFD slice loading not implemented through plotting.py."
         )
-        plot_params["csv_file_path_std"] = None
+    #     csv_file_path = (
+    #         Path(project_dir)
+    #         / "processed_data"
+    #         / "CFD_slices"
+    #         / f"spanwise_slices"
+    #         / f"alpha_{int(alpha)}_CFD_spanwise_slice_50cm_1.csv"
+    #     )
+    #     plot_params["csv_file_path_std"] = None
     else:
         aoa_rod = round(alpha + d_alpha_rod, 0)
         csv_file_path = (
             Path(project_dir)
-            / "processed_data"
-            / "stichted_planes_erik"
+            / "data"
+            / "piv_stichted_planes"
             / f"aoa_{int(aoa_rod)}"
             / f"aoa_{int(aoa_rod)}_Y{int(y_num)}_stitched.csv"
         )
         plot_params["csv_file_path_std"] = (
             Path(project_dir)
-            / "processed_data"
-            / "stichted_planes_erik"
+            / "data"
+            / "piv_stichted_planes"
             / f"aoa_{int(aoa_rod)}"
             / f"aoa_{int(aoa_rod)}_Y{int(y_num)}_stitched_std.csv"
         )

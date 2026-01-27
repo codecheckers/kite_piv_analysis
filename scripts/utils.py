@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from scipy.interpolate import (
-    interp2d,
+    LinearNDInterpolator,
 )
 
 project_dir = Path(__file__).resolve().parent.parent
@@ -12,29 +12,47 @@ def reshape_remove_nans(col, n_rows, n_cols):
     return col.fillna(0).values.reshape(n_rows, n_cols)
 
 
-def interp2d_batch(d2x, d2y, d2_values, points, kind="linear"):
-    """Perform 2D interpolation at multiple points using scipy's interp2d."""
-    # print(f"\ninput: d2x: {d2x}")
-    # print(f"\ninput: d2y: {d2y}")
-    # print(f"\ninput: d2_values: {d2_values}")
-    # print(f"\ninput: points: {points}")
-    # print(f"dim: d2x: {d2x.shape}, d2y: {d2y.shape}, d2_values: {d2_values.shape}")
+# def interp2d_batch(d2x, d2y, d2_values, points, kind="linear"):
+#     """Perform 2D interpolation at multiple points using scipy's interp2d."""
+#     # print(f"\ninput: d2x: {d2x}")
+#     # print(f"\ninput: d2y: {d2y}")
+#     # print(f"\ninput: d2_values: {d2_values}")
+#     # print(f"\ninput: points: {points}")
+#     # print(f"dim: d2x: {d2x.shape}, d2y: {d2y.shape}, d2_values: {d2_values.shape}")
 
-    # Create the interpolator
-    d2x_flat = np.sort(np.unique(d2x.ravel()))
-    d2y_flat = np.sort(np.unique(d2y.ravel()))
-    ip = interp2d(d2x_flat, d2y_flat, d2_values, kind=kind)
+#     # Create the interpolator
+#     d2x_flat = np.sort(np.unique(d2x.ravel()))
+#     d2y_flat = np.sort(np.unique(d2y.ravel()))
+#     ip = LinearNDInterpolator(
+#         (d2x_flat, d2y_flat),
+#         d2_values,
+#         method=kind,
+#         bounds_error=False,
+#         fill_value=np.nan,
+#     )
 
-    x_points, y_points = zip(*points)
+#     x_points, y_points = zip(*points)
 
-    ip_out_list = []
-    for xi, yi in zip(x_points, y_points):
-        # Perform interpolation for each point
-        ip_out = ip(xi, yi)
-        ip_out_list.append(ip_out)
-    # print(f"dim input: points: {np.array(points).shape}")
-    # print(f"dim: ip_out: {np.array(ip_out_list).shape}")
-    return np.array(ip_out_list).flatten()
+#     ip_out_list = []
+#     for xi, yi in zip(x_points, y_points):
+#         # Perform interpolation for each point
+#         ip_out = ip(xi, yi)
+#         ip_out_list.append(ip_out)
+#     # print(f"dim input: points: {np.array(points).shape}")
+#     # print(f"dim: ip_out: {np.array(ip_out_list).shape}")
+#     return np.array(ip_out_list).flatten()
+
+
+def interp2d_batch(d2x, d2y, d2_values, points):
+    interpolator = LinearNDInterpolator(
+        list(zip(d2x.flatten(), d2y.flatten())), d2_values.flatten()
+    )
+    return interpolator(points)
+
+    interpolator = LinearNDInterpolator(
+        list(zip(d2x.flatten(), d2y.flatten())), d2_values.flatten()
+    )
+    return interpolator(points)
 
 
 def csv_reader(
@@ -79,7 +97,7 @@ def reading_optimal_bound_placement(
     """
     # Reading in the airfoil centers
     df_optimal_bound_placement = pd.read_csv(
-        Path(project_dir) / "processed_data" / "optimal_bound_placement.csv"
+        Path(project_dir) / "data" / "optimal_bound_placement.csv"
     )
     # TODO: put back for single_row bound plot
     # df_optimal_bound_placement = pd.read_csv(

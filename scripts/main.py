@@ -13,7 +13,7 @@ def main():
     import scripts.irrelevant.plot_reflection_and_reinterpolation as plot_reflection_and_reinterpolation
     import plot_spanwise_CFD_slices_p_and_v
     import plot_spanwise_CFD_slices_w
-    import print_quantitative_results
+    import scripts.Table4_print_quantitative_results as Table4_print_quantitative_results
     import scripts.irrelevant.print_uncertainty as print_uncertainty
     import scripts.calculating_integrated_surface_pressure as calculating_integrated_surface_pressure
     import calculating_noca_and_kutta

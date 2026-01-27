@@ -8,10 +8,11 @@ from calculating_circulation import calculate_circulation
 from utils import reading_optimal_bound_placement
 import calculating_airfoil_centre
 from defining_bound_volume import boundary_ellipse, boundary_rectangle
-from VSM.core.WingGeometry import Wing
-from VSM.core.BodyAerodynamics import BodyAerodynamics
-from VSM.core.Solver import Solver
-from plot_styling import set_plot_style, plot_on_ax
+
+# from VSM.core.WingGeometry import Wing
+# from VSM.core.BodyAerodynamics import BodyAerodynamics
+# from VSM.core.Solver import Solver
+# from plot_styling import set_plot_style, plot_on_ax
 import force_from_noca
 from plotting import (
     load_data,
@@ -172,7 +173,7 @@ def computing_gamma_and_noca_fx_fy(
 
 
 def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
-    alpha: int = 6, y_num_list: list = [1]
+    alpha: int = 6, y_num_list: list = [1], n_points: int = 10
 ):
 
     Re_cfd = 1e6
@@ -206,6 +207,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
             "rectangle_size": 0.05,
         }
         df, x_mesh, y_mesh, plot_params_cfd = load_data(plot_params_cfd)
+        print(f"Computing CFD ellipse")
         (
             cfd_gamma_ellipse,
             cfd_fx_ellipse,
@@ -214,8 +216,9 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
             cfd_fx_ellipse_std,
             cfd_fy_ellipse_std,
         ) = computing_gamma_and_noca_fx_fy(
-            df, plot_params_cfd, is_ellipse=True, mu=mu_cfd
+            df, plot_params_cfd, is_ellipse=True, mu=mu_cfd, n_points=n_points
         )
+        print(f"Computing CFD rectangle")
         (
             cfd_gamma_rectangle,
             cfd_fx_rectangle,
@@ -224,7 +227,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
             cfd_fx_rectangle_std,
             cfd_fy_rectangle_std,
         ) = computing_gamma_and_noca_fx_fy(
-            df, plot_params_cfd, is_ellipse=False, mu=mu_cfd
+            df, plot_params_cfd, is_ellipse=False, mu=mu_cfd, n_points=n_points
         )
         cfd_ellipse_list.append(
             [
@@ -298,6 +301,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
             csv_path_std = plot_params_piv["csv_file_path_std"]
             df_std = pd.read_csv(csv_path_std)
             ## Normal
+            print(f"Computing PIV ellipse")
             (
                 piv_gamma_ellipse,
                 piv_fx_ellipse,
@@ -306,11 +310,9 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
                 piv_fx_ellipse_std,
                 piv_fy_ellipse_std,
             ) = computing_gamma_and_noca_fx_fy(
-                df,
-                plot_params_piv,
-                is_ellipse=True,
-                mu=mu_piv,
+                df, plot_params_piv, is_ellipse=True, mu=mu_piv, n_points=n_points
             )
+            print(f"Computing PIV rectangle")
             (
                 piv_gamma_rectangle,
                 piv_fx_rectangle,
@@ -319,10 +321,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
                 piv_fx_rectangle_std,
                 piv_fy_rectangle_std,
             ) = computing_gamma_and_noca_fx_fy(
-                df,
-                plot_params_piv,
-                is_ellipse=False,
-                mu=mu_piv,
+                df, plot_params_piv, is_ellipse=False, mu=mu_piv, n_points=n_points
             )
             ## mean - 1.96*std
             df_lower_bound = df.copy()
@@ -350,6 +349,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
                 plot_params_piv,
                 is_ellipse=True,
                 mu=mu_piv,
+                n_points=n_points,
             )
             (
                 lower_piv_gamma_rectangle,
@@ -363,6 +363,7 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
                 plot_params_piv,
                 is_ellipse=False,
                 mu=mu_piv,
+                n_points=n_points,
             )
 
             piv_ellipse_list.append(
@@ -406,10 +407,15 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
     )
 
 
-def save_results_single_alpha(alpha, y_num_list):
+def save_results_single_alpha(alpha, y_num_list, n_points=10):
+    print(
+        f"\n\n=====> Saving results for alpha: {alpha}\n, for y_num_list: {y_num_list}"
+    )
     ## acquiring data
     cfd_ellipse, cfd_rectangle, piv_ellipse, piv_rectangle = (
-        get_PIV_and_CFD_gamma_distribution_for_single_alpha(alpha, y_num_list)
+        get_PIV_and_CFD_gamma_distribution_for_single_alpha(
+            alpha, y_num_list, n_points=n_points
+        )
     )
     df = pd.DataFrame(
         {
@@ -461,20 +467,22 @@ def save_results_single_alpha(alpha, y_num_list):
     return df
 
 
-def saving_results():
+def saving_results(n_points=10):
     alpha = 6
     y_num_list = [1, 2, 3, 4, 5, 6, 7]
-    save_results_single_alpha(alpha, y_num_list)
+    save_results_single_alpha(alpha, y_num_list, n_points=n_points)
 
     alpha = 16
     y_num_list = [1]
-    save_results_single_alpha(alpha, y_num_list)
+    save_results_single_alpha(alpha, y_num_list, n_points=n_points)
 
 
-def main():
+def main(n_points=10):
 
-    # takes 30min or so
-    saving_results()
+    # takes very long time
+    print(f"---> Starting calculations and saving results")
+    print(f"---> This may take extremely long")
+    saving_results(n_points=n_points)
 
     ## reading results
     alpha = 6
@@ -540,16 +548,16 @@ def main():
 if __name__ == "__main__":
     # main()
 
-    # alpha = 6
-    # y_num_list = [1, 2, 3, 4, 5, 6, 7]
-    # save_results_single_alpha(alpha, y_num_list)
+    alpha = 6
+    y_num_list = [1, 2, 3, 4, 5, 6, 7]
+    save_results_single_alpha(alpha, y_num_list)
 
-    Re_cfd = 1e6
-    Re_piv = 3.8e5
-    rho = 1.20
-    ref_chord = 0.39834712
-    U_inf = 15
-    mu_cfd = (rho * ref_chord * U_inf) / Re_cfd
-    mu_piv = (rho * ref_chord * U_inf) / Re_piv
-    print(f"mu_cfd: {mu_cfd}, mu_piv: {mu_piv}")
-    breakpoint()
+    # Re_cfd = 1e6
+    # Re_piv = 3.8e5
+    # rho = 1.20
+    # ref_chord = 0.39834712
+    # U_inf = 15
+    # mu_cfd = (rho * ref_chord * U_inf) / Re_cfd
+    # mu_piv = (rho * ref_chord * U_inf) / Re_piv
+    # print(f"mu_cfd: {mu_cfd}, mu_piv: {mu_piv}")
+    # breakpoint()
