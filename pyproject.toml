@@ -88,7 +88,7 @@ dependencies = [
   "netCDF4",
   "scipy",
   "openpyxl",
-  "VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.0.0",
+  "VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.0.3",
 ]
 
 # You can define additional groups of dependencies here (e.g., development dependencies).
