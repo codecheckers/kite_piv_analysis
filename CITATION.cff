@@ -1,35 +1,58 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite the preferred citation below."
+title: >-
+  Flow Field Analysis of a Leading-Edge Inflatable Kite
+  Rigid Scale Model Using Stereoscopic Particle Image
+  Velocimetry
+message: >-
+  If you use this software, please cite the preferred
+  citation below.
 type: software
-title: "Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry"
 authors:
-  - family-names: "Poland"
-    given-names: "Jelle Agatho Wilhelm"
-    email: "j.a.w.poland@tudelft.nl"
-    affiliation: "Faculty of Aerospace Engineering, Delft University of Technology, Kluyverweg 1, 2629 HS, Delft, the Netherlands"
-  - family-names: "Fritz"
-    given-names: "Erik"
-    affiliation: "TNO, Kessler Park 1, 2288 GS Rijswijk, the Netherlands"
-  - family-names: "Schmehl"
-    given-names: "Roland"
-    affiliation: "Faculty of Aerospace Engineering, Delft University of Technology, Kluyverweg 1, 2629 HS, Delft, the Netherlands"
+  - family-names: Poland
+    given-names: Jelle Agatho Wilhelm
+    email: j.a.w.poland@tudelft.nl
+    affiliation: >-
+      Faculty of Aerospace Engineering, Delft University of
+      Technology, Kluyverweg 1, 2629 HS, Delft, the
+      Netherlands
+    orcid: 'https://orcid.org/0000-0003-3164-5648'
+  - family-names: Fritz
+    given-names: Erik
+    affiliation: 'TNO, Kessler Park 1, 2288 GS Rijswijk, the Netherlands'
+    email: e.fritz@tno.nl
+    orcid: 'https://orcid.org/0000-0003-1486-3643'
+  - family-names: Schmehl
+    given-names: Roland
+    affiliation: >-
+      Faculty of Aerospace Engineering, Delft University of
+      Technology, Kluyverweg 1, 2629 HS, Delft, the
+      Netherlands
+    email: R.Schmehl@tudelft.nl
+    orcid: 'https://orcid.org/0000-0002-4112-841X'
+identifiers:
+  - type: url
+    value: 'https://github.com/jellepoland/kite_piv_analysis'
+    description: github link
+repository-code: 'https://github.com/jellepoland/kite_piv_analysis'
 keywords:
   - wind energy
   - aerodynamics
   - leading-edge inflatable kite
   - kite design
   - computational fluid dynamics
-version: 0.1.0
-license: "MIT"
-repository-code: "https://github.com/jellepoland/kite_piv_analysis"
+license: MIT
+version: v0.0.4
+date-released: '2026-02-13'
 preferred-citation:
   type: article
-  title: "Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry"
+  title: >-
+    Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model
+    Using Stereoscopic Particle Image Velocimetry
   authors:
-    - family-names: "Poland"
-      given-names: "Jelle Agatho Wilhelm"
-    - family-names: "Fritz"
-      given-names: "Erik"
-    - family-names: "Schmehl"
-      given-names: "Roland"
-  journal: "Wind Energy Science"
+    - family-names: Poland
+      given-names: Jelle Agatho Wilhelm
+    - family-names: Fritz
+      given-names: Erik
+    - family-names: Schmehl
+      given-names: Roland
+  journal: Wind Energy Science
