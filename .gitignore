@@ -1,5 +1,6 @@
 # User defined files and folders
 data/
+!data/.gitkeep
 data_ALL_ERIK_FILES/
 data_old_21_10_2025/
 docs/
