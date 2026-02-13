@@ -1,4 +1,5 @@
 # User defined files and folders
+data_for_zenodo.zip
 data/
 !data/.gitkeep
 data_ALL_ERIK_FILES/

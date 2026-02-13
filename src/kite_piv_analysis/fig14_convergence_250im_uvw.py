@@ -250,63 +250,8 @@ def plot_variable_on_ax(
         ax.legend()
 
 
-def plot_convergence(variable, values_at_point_list, point_coords, V_values):
-    """
-    Plot convergence of a specific variable with a side-by-side comparison:
-    - Left: full velocity field with measurement point location
-    - Right: convergence plot of specified variable
-    """
-    # Set up the figure with two subplots side by side
-    set_plot_style()
-
-    # fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 5))
-
-    # # Left plot: velocity field and measurement point
-    # # Load CSV file into a DataFrame
-    # csv_file_path = Path(
-    #     project_dir,
-    #     "data",
-    #     "raw_images",
-    #     "aoa_13",
-    #     "Y1",
-    #     "normal_Y1_X2",
-    #     "B0001_subsampled.csv",
-    # )  # Replace with your actual path
-    # df = pd.read_csv(csv_file_path)
-
-    # # Filter valid points based on the 'isValid' column
-    # valid_points = df[df["isValid"] == 1.0]
-
-    # # Extract data for the scatter plot
-    # x_scatter = valid_points["x [mm]"] / 1e3  # Convert to meters if needed
-    # y_scatter = valid_points["y [mm]"] / 1e3  # Convert to meters if needed
-    # intensity = valid_points["Intensity [counts]"]
-
-    # # Scatter plot of intensity
-    # sc = ax1.scatter(
-    #     x_scatter,
-    #     y_scatter,
-    #     c=intensity,
-    #     cmap="binary",
-    #     alpha=0.7,
-    #     s=5,  # Adjust point size
-    #     label="Intensity [counts]",
-    #     vmin=0,
-    #     vmax=4000,
-    # )
-
-    # # Add color bar
-    # fig.colorbar(sc, ax=ax1, label="Intensity [counts]")
-
-    # # Add labels and legend
-    # ax1.set_xlabel("x [m]")
-    # ax1.set_ylabel("y [m]")
-    # ax1.grid(False)
-    ##TODO: You can add a plot, with the raw image if reviewers ask for it
-    # Create 3 rows x 2 columns: left = raw, right = filtered (same ordering)
-    fig, axes = plt.subplots(3, 2, figsize=(12, 9))
-
-    # Build a single shuffled ordering that will be reused for all variables
+def _build_shuffled_data(values_at_point_list):
+    """Build a single shuffled ordering and extract raw + filtered values for u, v, w."""
     n_samples = len(values_at_point_list)
     indices = list(range(n_samples))
     random.shuffle(indices)
@@ -317,17 +262,16 @@ def plot_convergence(variable, values_at_point_list, point_coords, V_values):
         ("w", r"$u_{z}$"),
     ]
 
-    for row, (var_col, var_label) in enumerate(variables):
-        # column name in DataFrame
-        if var_col == "V":
-            colname = f"Velocity |{var_col}| [m/s]"
-        else:
-            colname = f"Velocity {var_col} [m/s]"
+    rows_data = []
+    for var_col, var_label in variables:
+        colname = (
+            f"Velocity |{var_col}| [m/s]"
+            if var_col == "V"
+            else f"Velocity {var_col} [m/s]"
+        )
 
-        # Unfiltered values (preserve ordering by indices)
         unfiltered = [values_at_point_list[i].loc[colname] for i in indices]
 
-        # Filtered values: apply DaVis isValid and |w| <= 3 m/s on each sample
         filtered = []
         for i, val in zip(indices, unfiltered):
             series = values_at_point_list[i]
@@ -338,9 +282,82 @@ def plot_convergence(variable, values_at_point_list, point_coords, V_values):
             else:
                 filtered.append(np.nan)
 
-        # X-axis
-        x_axis = range(1, n_samples + 1)
+        rows_data.append((var_col, var_label, unfiltered, filtered))
 
+    return n_samples, rows_data
+
+
+def _running_mean_nan(values):
+    """Compute a running mean that ignores NaN entries."""
+    result = []
+    cumsum = 0.0
+    count = 0
+    for v in values:
+        if np.isnan(v):
+            result.append(np.nan if count == 0 else cumsum / count)
+        else:
+            cumsum += v
+            count += 1
+            result.append(cumsum / count)
+    return result
+
+
+def plot_convergence_single_col(values_at_point_list):
+    """
+    Single-column (3×1) convergence plot showing filtered data only.
+    Saved as fig14_convergence_250im_uvw.pdf
+    """
+    set_plot_style()
+    n_samples, rows_data = _build_shuffled_data(values_at_point_list)
+    x_axis = range(1, n_samples + 1)
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 8))
+
+    for row, (_var_col, var_label, _unfiltered, filtered) in enumerate(rows_data):
+        ax = axes[row]
+        plot_on_ax(
+            ax,
+            x_axis,
+            filtered,
+            label="Local value",
+            linestyle="-",
+            color="b",
+            is_with_grid=False,
+            is_with_x_label=(row == 2),
+            is_with_x_tick_label=(row == 2),
+            x_label="Number of samples",
+            y_label=f"{var_label} " + r"(ms$^{-1}$)",
+            is_with_legend=False,
+        )
+        running_mean_f = _running_mean_nan(filtered)
+        ax.plot(x_axis, running_mean_f, "r-", linewidth=2, label="Running Mean")
+        if row == 0:
+            ax.legend()
+
+    plt.tight_layout()
+    save_path = Path(
+        project_dir,
+        "results",
+        "paper_plots_21_10_2025",
+        "fig14_convergence_250im_uvw.pdf",
+    )
+    plt.savefig(save_path)
+    plt.close()
+    print(f"Convergence plot (1-col) saved to {save_path}")
+
+
+def plot_convergence_two_col(values_at_point_list):
+    """
+    Two-column (3×2) convergence plot: left = raw, right = filtered.
+    Saved as fig14_convergence_250im_uvw_2col.pdf
+    """
+    set_plot_style()
+    n_samples, rows_data = _build_shuffled_data(values_at_point_list)
+    x_axis = range(1, n_samples + 1)
+
+    fig, axes = plt.subplots(3, 2, figsize=(12, 9))
+
+    for row, (_var_col, var_label, unfiltered, filtered) in enumerate(rows_data):
         # Left: raw
         ax_left = axes[row, 0]
         plot_on_ax(
@@ -378,32 +395,21 @@ def plot_convergence(variable, values_at_point_list, point_coords, V_values):
             x_label="Number of samples",
             y_label=f"{var_label} (ms$^{{-1}}$)",
         )
-        # running mean should ignore NaNs: compute cumulative mean of valid entries
-        running_mean_f = []
-        cumsum = 0.0
-        count = 0
-        for v in filtered:
-            if np.isnan(v):
-                running_mean_f.append(np.nan if count == 0 else cumsum / count)
-            else:
-                cumsum += v
-                count += 1
-                running_mean_f.append(cumsum / count)
+        running_mean_f = _running_mean_nan(filtered)
         ax_right.plot(x_axis, running_mean_f, "r-", linewidth=2)
         if row == 0:
             ax_right.set_title("Filtered: isValid and |w|<=3 m/s")
 
-    # Adjust layout and save
     plt.tight_layout()
-    plt.savefig(
-        Path(
-            project_dir,
-            "results",
-            "paper_plots_21_10_2025",
-            f"fig14_convergence_250im_uvw.pdf",
-        )
+    save_path = Path(
+        project_dir,
+        "results",
+        "paper_plots_21_10_2025",
+        "fig14_convergence_250im_uvw_2col.pdf",
     )
+    plt.savefig(save_path)
     plt.close()
+    print(f"Convergence plot (2-col) saved to {save_path}")
 
 
 # Example usage
@@ -414,8 +420,11 @@ def main():
     # Calculate values for Y4
     values, V_values, all_V_values, all_is_valid, all_w = calculate_values(point_coords)
 
-    # Plot convergence for Y4 (left = raw, right = filtered)
-    plot_convergence("V", values, point_coords, V_values)
+    # Plot 1: single-column (filtered only) → fig14_convergence_250im_uvw.pdf
+    plot_convergence_single_col(values)
+
+    # Plot 2: two-column (raw vs filtered) → fig14_convergence_250im_uvw_2col.pdf
+    plot_convergence_two_col(values)
 
 
 if __name__ == "__main__":
