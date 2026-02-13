@@ -84,7 +84,10 @@ def running_NOCA(
     from kite_piv_analysis import calculating_airfoil_centre
     from kite_piv_analysis import force_from_noca
     from kite_piv_analysis.utils import reading_optimal_bound_placement
-    from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+    from kite_piv_analysis.defining_bound_volume import (
+        boundary_ellipse,
+        boundary_rectangle,
+    )
 
     x_airfoil, y_airfoil, chord = calculating_airfoil_centre.main(
         alpha, y_num, is_with_chord=True
@@ -262,7 +265,7 @@ def main():
     spatial_scale = 2.584
     velocity_scale = 15
     rho_scaling = 1.2
-    rho = 1  # 1.2 #TODO: change back to 1.2
+    rho = 1.2  # 1.2 #TODO: change back to 1.2
     U_inf = 15
     Re = 1e6
     p_ref = 0

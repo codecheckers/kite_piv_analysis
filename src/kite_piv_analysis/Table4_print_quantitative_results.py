@@ -212,7 +212,7 @@ def main():
     #     index=False,
     # )
 
-    import scripts.calculating_integrated_surface_pressure as calculating_integrated_surface_pressure
+    from kite_piv_analysis import calculating_integrated_surface_pressure
 
     calculating_integrated_surface_pressure.main()
 

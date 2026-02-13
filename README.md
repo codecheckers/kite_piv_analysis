@@ -23,7 +23,7 @@ This repository contains code that generates the figures a paper, titled: ["Flow
     ```
 2. Download the necessary data from [Zenodo](https://doi.org/10.5281/zenodo.17395913) and place inside the `data/` folder.
 
-4. Run 
+3. To process the data and generate the figures, run the following from the repository root (this will likely take hours):
     ```bash
     python ./src/kite_piv_analysis/_main_process_and_plot.py
     ```

@@ -757,10 +757,6 @@ def plot_noca_coefficients_grid(
     return fig, axes
 
 
-# TODO: if you are happy with noca and kutta results
-# then rerun all these, but change hte size to 5% width instead of 10%
-
-
 def _convergence_csvs_exist(
     alpha: int,
     y_num: int,

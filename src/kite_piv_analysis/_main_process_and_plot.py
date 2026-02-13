@@ -44,6 +44,7 @@ PLOT_MODULES = [
     "fig13_convergence_study",
     "fig14_convergence_250im_uvw",
     "fig15_line_interference_PIV",
+    "Table4_print_quantitative_results",
 ]
 
 SMOKE_PLOT_MODULES = ["fig04_plane_location"]
@@ -57,7 +58,7 @@ SMOKE_PARAMETER_NAMES = ["iP"]
 FULL_FAST_FACTOR = 10
 SMOKE_FAST_FACTOR = 50
 
-FULL_SWEEP_N_POINTS = 2  # TODO: should be 10 -please revert back
+FULL_SWEEP_N_POINTS = 10
 SMOKE_SWEEP_N_POINTS = 2
 
 FULL_GAMMA_Y_NUM_LIST = [1, 2, 3, 4, 5, 6, 7]

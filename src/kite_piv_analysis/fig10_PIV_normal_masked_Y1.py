@@ -100,8 +100,6 @@ def normal_masked_interpolated(plot_params: dict) -> None:
             plot_params["is_with_interpolation"] = True
             print(f'is with interpolation: {plot_params["is_with_interpolation"]}')
 
-            ##TODO: change plotparmaters for the interpolation
-
         df_piv, x_mesh_piv, y_mesh_piv, plot_params = load_data(
             plot_params | {"is_CFD": False}
         )
