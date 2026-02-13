@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from pathlib import Path
-from utils import project_dir
-from calculating_circulation import calculate_circulation
-from utils import reading_optimal_bound_placement
-import calculating_airfoil_centre
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-from plot_styling import set_plot_style, plot_on_ax
-import force_from_noca
-from plotting import (
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.calculating_circulation import calculate_circulation
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis import calculating_airfoil_centre
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis.plot_styling import set_plot_style, plot_on_ax
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.plotting import (
     load_data,
     find_areas_needing_interpolation,
     interpolate_missing_data,
@@ -88,7 +88,9 @@ def plot_gamma_distribution(save_path):
 
     # only generate data if it does not exist yet, as it takes long
     if not csv_path.exists():
-        from calculating_noca_and_kutta import save_results_single_alpha
+        from kite_piv_analysis.calculating_noca_and_kutta import (
+            save_results_single_alpha,
+        )
 
         print(f"CSV not found: {csv_path.name} — generating data (this takes ~45 min)")
         alpha = 6
@@ -295,7 +297,7 @@ def main():
         Path(project_dir)
         / "results"
         / "paper_plots_21_10_2025"
-        / "fig08_gamma_distribution_std.pdf"
+        / "fig08_gamma_distribution_std_preprint.pdf"
     )
     plot_gamma_distribution(save_path)
 

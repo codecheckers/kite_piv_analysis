@@ -3,16 +3,16 @@ import pandas as pd
 from pathlib import Path
 from typing import Union, List, Tuple, Dict, Optional
 from dataclasses import dataclass, field
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from utils import project_dir
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.utils import project_dir
 from typing import List, Dict, Any, Optional
-from plot_styling import set_plot_style, plot_on_ax
+from kite_piv_analysis.plot_styling import set_plot_style, plot_on_ax
 import matplotlib.pyplot as plt
-import calculating_airfoil_centre
-from plotting import *
-from utils import reading_optimal_bound_placement
-import calculating_circulation
+from kite_piv_analysis import calculating_airfoil_centre
+from kite_piv_analysis.plotting import *
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis import calculating_circulation
 
 
 @dataclass
@@ -620,7 +620,7 @@ def plot_noca_coefficients_grid(
         "C_l": {
             "row": 0,
             "ylim": (0.2, 1.2),
-            "ylabel": "$C_{\mathrm{l, NOCA}}$ (-)",
+            "ylabel": r"$C_{\mathrm{l, NOCA}}$ (-)",
             "title_template": "{param} Effect on $C_l$",
         },
         # "C_d": {
@@ -632,8 +632,8 @@ def plot_noca_coefficients_grid(
         "Gamma": {
             "row": 1,
             "ylim": (-0.3, 4),
-            "ylabel": "$\Gamma$ (-)",
-            "title_template": "{param} Effect on $\Gamma$",
+            "ylabel": r"$\Gamma$ (-)",
+            "title_template": r"{param} Effect on $\Gamma$",
         },
     }
 
@@ -713,7 +713,7 @@ def plot_noca_coefficients_grid(
                         )
                         if key == "Ellipse" and param == "dLy":
                             cbar = ax.figure.colorbar(
-                                sc, ax=ax, label=f"\% of interpolated data points"
+                                sc, ax=ax, label=r"\% of interpolated data points"
                             )
 
             # Set plot details
@@ -761,6 +761,28 @@ def plot_noca_coefficients_grid(
 # then rerun all these, but change hte size to 5% width instead of 10%
 
 
+def _convergence_csvs_exist(
+    alpha: int,
+    y_num: int,
+    parameter_names: list,
+    data_types: list = ["CFD", "PIV"],
+) -> bool:
+    """Check whether all cached convergence CSVs already exist for a given (alpha, y_num)."""
+    folder = Path(project_dir) / "processed_data" / "convergence_study"
+    for data_type in data_types:
+        for shape in ["Ellipse", "Rectangle"]:
+            for param in parameter_names:
+                if not (
+                    folder / f"alpha_{alpha}_Y{y_num}_{data_type}_{shape}_{param}.csv"
+                ).exists():
+                    return False
+    sweep_folder = folder / "PIV_sweep"
+    for shape in ["Ellipse", "Rectangle"]:
+        if not (sweep_folder / f"alpha_{alpha}_Y{y_num}_PIV_{shape}.csv").exists():
+            return False
+    return True
+
+
 def main():
     # Settings
     is_CFD = True
@@ -778,7 +800,7 @@ def main():
                 / f"alpha_{alpha}"
                 / f"n_point_CFD_PIV_Y_{y_num}_2x3.pdf"
             )
-            if not save_path.exists():
+            if not _convergence_csvs_exist(alpha, y_num, parameter_names):
                 storing_and_collecting_results(
                     alpha, y_num, parameter_names, fast_factor=fast_factor
                 )
@@ -801,7 +823,7 @@ def main():
                 / f"alpha_{alpha}"
                 / f"n_point_CFD_PIV_Y_{y_num}_2x3.pdf"
             )
-            if not save_path.exists():
+            if not _convergence_csvs_exist(alpha, y_num, parameter_names):
                 storing_and_collecting_results(
                     alpha, y_num, parameter_names, fast_factor=fast_factor
                 )

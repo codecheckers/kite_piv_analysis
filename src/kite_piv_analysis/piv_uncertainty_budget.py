@@ -22,9 +22,12 @@ import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from utils import project_dir
-from plot_styling import set_plot_style
-from compute_overlap_error import load_dat_file, load_dat_file_with_std
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.plot_styling import set_plot_style
+from kite_piv_analysis.compute_overlap_error import (
+    load_dat_file,
+    load_dat_file_with_std,
+)
 
 
 # =============================================================================
@@ -60,16 +63,16 @@ def load_raw_plane_data(aoa: int, y_plane: int, x_plane: int, config: str = "nor
     Load raw PIV plane data (B0001.dat mean, B0002.dat std).
 
     Searches in multiple locations:
-    1. ALL_ERIK_FILES/JelleStitching/Input (primary)
-    2. data/old_21_10_2025/raw_dat_files (fallback for missing planes like aoa_23/Y4)
+    1. data_ALL_ERIK_FILES/JelleStitching/Input (primary)
+    2. data_old_21_10_2025/raw_dat_files (fallback for missing planes like aoa_23/Y4)
 
     Returns:
         mean_data, std_data dictionaries
     """
     # Primary location
     input_dirs = [
-        Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input",
-        Path(project_dir) / "data" / "old_21_10_2025" / "raw_dat_files",
+        Path(project_dir) / "data_ALL_ERIK_FILES" / "JelleStitching" / "Input",
+        Path(project_dir) / "data_old_21_10_2025" / "raw_dat_files",
     ]
 
     for input_dir in input_dirs:
@@ -294,8 +297,8 @@ def create_spatial_uncertainty_map(
     """
     # Search in multiple directories
     input_dirs = [
-        Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input",
-        Path(project_dir) / "data" / "old_21_10_2025" / "raw_dat_files",
+        Path(project_dir) / "data_ALL_ERIK_FILES" / "JelleStitching" / "Input",
+        Path(project_dir) / "data_old_21_10_2025" / "raw_dat_files",
     ]
 
     for input_dir in input_dirs:

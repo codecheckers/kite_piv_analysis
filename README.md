@@ -1,14 +1,7 @@
 <!-- [![CODECHECK](https://codecheck.org.uk/img/codeworks-badge.svg)](https://doi.org/10.5281/zenodo.15603144) -->
 
-# Computational aerodynamics for soft-wing kite design
-This repository contains code that generates the figures a paper, titled "Computational aerodynamics for 
-soft-wing kite design" published Open-Source in Wind Energy science, [INSERT LINK HERE].
-
-Download from [Zenodo](https://doi.org/10.5281/zenodo.16925758) and place in `data/ml_models/`
-
-A machine learning model was trained on more than a hundred thousands Reynolds-average Navier Stokes (RANS) Computational Fluid Dynamics (CFD) simulations made for leading-edge inflatable airfoils, documented in the paper and in the MSc. thesis of [K.R.G. Masure](https://resolver.tudelft.nl/uuid:865d59fc-ccff-462e-9bac-e81725f1c0c9), the [code base is also open-source accessible](https://github.com/awegroup/Pointwise-Openfoam-toolchain).
-
-As the three trained models, for Reynolds number = 1e6, 5e6 and 1e7 are too large (~2.3GB) for GitHub, they have to be downloaded separately, and added to the `data/ml_models` folder. They are accessible through [Zenodo](https://doi.org/10.5281/zenodo.16925758), and so is the [CFD data](https://doi.org/10.5281/zenodo.16925833) on which the models are trained. 
+# Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry
+This repository contains code that generates the figures a paper, titled: ["Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry"](https://wes.copernicus.org/preprints/wes-2025-217/wes-2025-217.pdf) published Open-Source in Wind Energy science.
 
 ## Usage instructions
 1. Install the repository:
@@ -28,26 +21,27 @@ As the three trained models, for Reynolds number = 1e6, 5e6 and 1e7 are too larg
     .\venv\Scripts\Activate.ps1; `
     pip install -e .[dev]
     ```
-2. Download ML models from: [Zenodo](https://doi.org/10.5281/zenodo.16925758) and place inside the `data/ml_models` folder.
+2. Download the necessary data from [Zenodo](https://doi.org/10.5281/zenodo.17395913) and place inside the `data/` folder.
 
-3. Download the rest of the supporing data from: [INSERT LINK HERE] and place inside the `data/` folder.
-   
 4. Run 
     ```bash
-    python -m wes_aero_sim_for_kite_design.main
+    python ./src/kite_piv_analysis/_main_process_and_plot.py
     ```
 
 ### Dependencies
-- "numpy", 
--  "pandas>=1.5.3", 
--  "matplotlib>=3.7.1",
--  "odfpy",
--  "VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.0.3",
+- `numpy`
+- `pandas>=1.5.3`
+- `matplotlib>=3.7.1`
+- `cycler`
+- `xarray>=2024.6.0`
+- `netCDF4`
+- `scipy`
+- `openpyxl`
+- `VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.1.0`
 
 ## Citation
 If you use this project in your research, please consider citing it. 
 Citation details can be found in the [CITATION.cff](CITATION.cff) file included in this repository.
-
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -60,4 +54,4 @@ Specify the license under which your software is distributed and include the cop
 > 
 > Prof.dr. H.G.C. (Henri) Werij, Dean of Aerospace Engineering
 > 
-> Copyright (c) [YEAR] Jelle Poland
+> Copyright (c) [2026] Jelle Poland

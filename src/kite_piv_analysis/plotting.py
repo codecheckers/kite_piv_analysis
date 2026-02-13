@@ -10,14 +10,17 @@ from pathlib import Path
 import pandas as pd
 import os
 from typing import TypedDict, Optional
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 from io import StringIO
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from calculating_circulation import calculate_circulation
-import calculating_airfoil_centre
-from interpolating import interpolate_missing_data, find_areas_needing_interpolation
-from utils import reading_optimal_bound_placement
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.calculating_circulation import calculate_circulation
+from kite_piv_analysis import calculating_airfoil_centre
+from kite_piv_analysis.interpolating import (
+    interpolate_missing_data,
+    find_areas_needing_interpolation,
+)
+from kite_piv_analysis.utils import reading_optimal_bound_placement
 
 
 class PlotParams(TypedDict):
@@ -358,7 +361,7 @@ def plot_airfoil(
     airfoil_file = Path(project_dir) / "data" / "airfoils" / f"y{y_num}.dat"
 
     # Read the .dat file manually handling headers and whitespaces
-    airfoil_data = pd.read_csv(airfoil_file, header=None, skiprows=1, sep="\s+")
+    airfoil_data = pd.read_csv(airfoil_file, header=None, skiprows=1, sep=r"\s+")
 
     # Manually set the correct column names
     airfoil_data.columns = ["x [m]", "y [m]", "x/c [-]", "y/c [-]"]

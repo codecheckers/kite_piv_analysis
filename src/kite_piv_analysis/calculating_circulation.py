@@ -3,8 +3,8 @@ import pandas as pd
 from scipy.interpolate import interp2d, griddata
 from pathlib import Path
 import time
-from utils import project_dir, reshape_remove_nans, interp2d_batch
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis.utils import project_dir, reshape_remove_nans, interp2d_batch
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
 
 
 def calculate_circulation(

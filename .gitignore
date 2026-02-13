@@ -1,8 +1,14 @@
 # User defined files and folders
 data/
+data_ALL_ERIK_FILES/
+data_old_21_10_2025/
+docs/
+media/
 processed_data/
+processed_data_copy/
 results/
-ALL_ERIK_FILES/
+results_copy/
+scripts/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

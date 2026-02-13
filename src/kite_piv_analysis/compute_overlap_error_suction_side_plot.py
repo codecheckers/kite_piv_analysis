@@ -9,14 +9,14 @@ import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-from utils import project_dir
-from compute_overlap_error import (
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.compute_overlap_error import (
     load_dat_file_with_std,
     load_dat_file,
     interpolate_to_grid,
 )
-from plot_styling import set_plot_style
-from plotting import plot_airfoil
+from kite_piv_analysis.plot_styling import set_plot_style
+from kite_piv_analysis.plotting import plot_airfoil
 
 
 def collect_y1_data(
@@ -34,17 +34,17 @@ def collect_y1_data(
     Applies per-plane delta_x/delta_y from planes_location.csv.
     """
     # Default input dir (newer pre-processed structure)
-    input_dir = Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input"
+    input_dir = Path(project_dir) / "data_ALL_ERIK_FILES" / "JelleStitching" / "Input"
     # Fallback for missing Y4 at aoa=23: use older raw bundle
     if aoa == 23 and y_num == 4:
-        input_dir = Path(project_dir) / "data" / "old_21_10_2025" / "raw_dat_files"
+        input_dir = Path(project_dir) / "data_old_21_10_2025" / "raw_dat_files"
 
     U_inf = 15.0  # Freestream velocity
     std_threshold = 0.1
     # plane offsets table (alpha stored as 6/16; map AoA 23 -> alpha 16)
     planes_loc = pd.read_csv(
         Path(project_dir)
-        / "ALL_ERIK_FILES"
+        / "data_ALL_ERIK_FILES"
         / "JelleStitching"
         / "Input"
         / "planes_location.csv"

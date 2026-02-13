@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from typing import Optional, Tuple
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 
 
 def main(
@@ -41,7 +41,7 @@ def main(
 
     # Path to the airfoil data file
     airfoil_file = Path(project_dir) / "data" / "airfoils" / f"y{y_num}.dat"
-    airfoil_data = pd.read_csv(airfoil_file, header=None, skiprows=1, sep="\s+")
+    airfoil_data = pd.read_csv(airfoil_file, header=None, skiprows=1, sep=r"\s+")
 
     # Extract x and y coordinates of the airfoil
     x_coords = airfoil_data.iloc[:, 0].values

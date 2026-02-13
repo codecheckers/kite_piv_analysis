@@ -11,10 +11,10 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import matplotlib.pyplot as plt
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 
 # Import functions from main script
-from compute_overlap_error import (
+from kite_piv_analysis.compute_overlap_error import (
     load_dat_file_with_std,
     load_dat_file,
     interpolate_to_grid,
@@ -25,7 +25,9 @@ def analyze_refined():
     """
     Refined analysis focusing on u-velocity per Y-plane.
     """
-    input_dir = Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input"
+    input_dir = (
+        Path(project_dir) / "data" / "ALL_ERIK_FILES" / "JelleStitching" / "Input"
+    )
     output_dir = Path(project_dir) / "results" / "overlap_analysis"
     output_dir.mkdir(parents=True, exist_ok=True)
 

@@ -10,13 +10,13 @@ from pathlib import Path
 import pandas as pd
 import os
 from typing import TypedDict, Optional
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 from io import StringIO
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from calculating_circulation import calculate_circulation
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.calculating_circulation import calculate_circulation
 from typing import Tuple, List, Union
-from plotting import *
+from kite_piv_analysis.plotting import *
 from scipy.spatial import ConvexHull
 
 

@@ -4,7 +4,7 @@ import os
 import scipy.interpolate as interpolate
 from scipy.interpolate import griddata
 from pathlib import Path
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 import matplotlib.pyplot as plt
 
 
@@ -12,6 +12,9 @@ def scaling_CFD(
     data_array, headers, vel_scaling=15, spatial_scaling=2.584, rho_scaling=1.2
 ):
     """Scale velocity components in the data array by the given factor, ignoring x, y, z columns."""
+    # Ensure writable ndarray (pandas can return read-only views).
+    data_array = np.array(data_array, copy=True)
+
     # Find the indices of velocity-related columns (anything except 'x', 'y', 'z')
     for i, header in enumerate(headers):
         if header in ["x", "y", "z"]:
@@ -262,8 +265,8 @@ def process_csv(
         # Rename columns using the mapping
         filtered_df = filtered_df.rename(columns=header_mapping)
 
-        # Convert DataFrame to numpy array for velocity scaling
-        data_array = filtered_df.values
+        # Convert DataFrame to writable numpy array for velocity scaling
+        data_array = filtered_df.to_numpy(copy=True)
         headers = filtered_df.columns.tolist()
         # print(f"headers: {headers}")
 

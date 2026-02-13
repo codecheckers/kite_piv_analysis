@@ -19,8 +19,8 @@ import pandas as pd
 from pathlib import Path
 from scipy.interpolate import griddata
 import matplotlib.pyplot as plt
-from utils import project_dir
-from plot_styling import set_plot_style
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.plot_styling import set_plot_style
 
 
 def load_dat_file(filepath):
@@ -361,7 +361,7 @@ def main():
     """
     Main function to compute overlap error statistics for all planes.
     """
-    input_dir = Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input"
+    input_dir = Path(project_dir) / "data_ALL_ERIK_FILES" / "JelleStitching" / "Input"
     output_dir = Path(project_dir) / "results" / "overlap_analysis"
     output_dir.mkdir(parents=True, exist_ok=True)
 

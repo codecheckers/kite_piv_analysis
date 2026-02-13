@@ -1,5 +1,5 @@
-from plotting import *
-from plot_styling import set_plot_style
+from kite_piv_analysis.plotting import *
+from kite_piv_analysis.plot_styling import set_plot_style
 from matplotlib.gridspec import GridSpec
 from matplotlib.lines import Line2D
 

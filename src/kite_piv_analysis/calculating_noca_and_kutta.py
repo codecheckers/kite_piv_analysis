@@ -3,18 +3,18 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 from pathlib import Path
-from utils import project_dir
-from calculating_circulation import calculate_circulation
-from utils import reading_optimal_bound_placement
-import calculating_airfoil_centre
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.calculating_circulation import calculate_circulation
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis import calculating_airfoil_centre
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
 
 # from VSM.core.WingGeometry import Wing
 # from VSM.core.BodyAerodynamics import BodyAerodynamics
 # from VSM.core.Solver import Solver
 # from plot_styling import set_plot_style, plot_on_ax
-import force_from_noca
-from plotting import (
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.plotting import (
     load_data,
     find_areas_needing_interpolation,
     interpolate_missing_data,
@@ -187,7 +187,10 @@ def computing_gamma_and_noca_fx_fy(
 
 
 def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
-    alpha: int = 6, y_num_list: list = [1], n_points: int = 10
+    alpha: int = 6,
+    y_num_list: list = [1],
+    n_points: int = 10,
+    is_with_lower_bound: bool = True,
 ):
 
     Re_cfd = 1e6
@@ -337,48 +340,62 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
             ) = computing_gamma_and_noca_fx_fy(
                 df, plot_params_piv, is_ellipse=False, mu=mu_piv, n_points=n_points
             )
-            ## mean - 1.96*std
-            df_lower_bound = df.copy()
-            df_lower_bound["u"] = df["u"] - 1.96 * df_std["u"]
-            df_lower_bound["v"] = df["v"] - 1.96 * df_std["v"]
-            df_lower_bound["w"] = df["w"] - 1.96 * df_std["w"]
-            df_lower_bound["V"] = df["V"] - 1.96 * df_std["V"]
-            df_lower_bound["dudx"] = df["dudx"] - 1.96 * df_std["dudx"]
-            df_lower_bound["dudy"] = df["dudy"] - 1.96 * df_std["dudy"]
-            df_lower_bound["dvdx"] = df["dvdx"] - 1.96 * df_std["dvdx"]
-            df_lower_bound["dvdy"] = df["dvdy"] - 1.96 * df_std["dvdy"]
-            df_lower_bound["dwdx"] = df["dwdx"] - 1.96 * df_std["dwdx"]
-            df_lower_bound["dwdy"] = df["dwdy"] - 1.96 * df_std["dwdy"]
-            df_lower_bound["vort_z"] = df["vort_z"] - 1.96 * df_std["vort_z"]
+            if is_with_lower_bound:
+                ## mean - 1.96*std
+                df_lower_bound = df.copy()
+                df_lower_bound["u"] = df["u"] - 1.96 * df_std["u"]
+                df_lower_bound["v"] = df["v"] - 1.96 * df_std["v"]
+                df_lower_bound["w"] = df["w"] - 1.96 * df_std["w"]
+                df_lower_bound["V"] = df["V"] - 1.96 * df_std["V"]
+                df_lower_bound["dudx"] = df["dudx"] - 1.96 * df_std["dudx"]
+                df_lower_bound["dudy"] = df["dudy"] - 1.96 * df_std["dudy"]
+                df_lower_bound["dvdx"] = df["dvdx"] - 1.96 * df_std["dvdx"]
+                df_lower_bound["dvdy"] = df["dvdy"] - 1.96 * df_std["dvdy"]
+                df_lower_bound["dwdx"] = df["dwdx"] - 1.96 * df_std["dwdx"]
+                df_lower_bound["dwdy"] = df["dwdy"] - 1.96 * df_std["dwdy"]
+                df_lower_bound["vort_z"] = df["vort_z"] - 1.96 * df_std["vort_z"]
 
-            (
-                lower_piv_gamma_ellipse,
-                lower_piv_fx_ellipse,
-                lower_piv_fy_ellipse,
-                lower_piv_gamma_ellipse_std,
-                lower_piv_fx_ellipse_std,
-                lower_piv_fy_ellipse_std,
-            ) = computing_gamma_and_noca_fx_fy(
-                df_lower_bound,
-                plot_params_piv,
-                is_ellipse=True,
-                mu=mu_piv,
-                n_points=n_points,
-            )
-            (
-                lower_piv_gamma_rectangle,
-                lower_piv_fx_rectangle,
-                lower_piv_fy_rectangle,
-                lower_piv_gamma_rectangle_std,
-                lower_piv_fx_rectangle_std,
-                lower_piv_fx_rectangle_std,
-            ) = computing_gamma_and_noca_fx_fy(
-                df_lower_bound,
-                plot_params_piv,
-                is_ellipse=False,
-                mu=mu_piv,
-                n_points=n_points,
-            )
+                (
+                    lower_piv_gamma_ellipse,
+                    lower_piv_fx_ellipse,
+                    lower_piv_fy_ellipse,
+                    lower_piv_gamma_ellipse_std,
+                    lower_piv_fx_ellipse_std,
+                    lower_piv_fy_ellipse_std,
+                ) = computing_gamma_and_noca_fx_fy(
+                    df_lower_bound,
+                    plot_params_piv,
+                    is_ellipse=True,
+                    mu=mu_piv,
+                    n_points=n_points,
+                )
+                (
+                    lower_piv_gamma_rectangle,
+                    lower_piv_fx_rectangle,
+                    lower_piv_fy_rectangle,
+                    lower_piv_gamma_rectangle_std,
+                    lower_piv_fx_rectangle_std,
+                    lower_piv_fx_rectangle_std,
+                ) = computing_gamma_and_noca_fx_fy(
+                    df_lower_bound,
+                    plot_params_piv,
+                    is_ellipse=False,
+                    mu=mu_piv,
+                    n_points=n_points,
+                )
+            else:
+                lower_piv_gamma_ellipse = np.nan
+                lower_piv_fx_ellipse = np.nan
+                lower_piv_fy_ellipse = np.nan
+                lower_piv_gamma_ellipse_std = np.nan
+                lower_piv_fx_ellipse_std = np.nan
+                lower_piv_fy_ellipse_std = np.nan
+                lower_piv_gamma_rectangle = np.nan
+                lower_piv_fx_rectangle = np.nan
+                lower_piv_fy_rectangle = np.nan
+                lower_piv_gamma_rectangle_std = np.nan
+                lower_piv_fx_rectangle_std = np.nan
+                lower_piv_fy_rectangle_std = np.nan
 
             piv_ellipse_list.append(
                 [
@@ -421,14 +438,19 @@ def get_PIV_and_CFD_gamma_distribution_for_single_alpha(
     )
 
 
-def save_results_single_alpha(alpha, y_num_list, n_points=10):
+def save_results_single_alpha(
+    alpha, y_num_list, n_points=10, is_with_lower_bound: bool = True
+):
     print(
         f"\n\n=====> Saving results for alpha: {alpha}\n, for y_num_list: {y_num_list}"
     )
     ## acquiring data
     cfd_ellipse, cfd_rectangle, piv_ellipse, piv_rectangle = (
         get_PIV_and_CFD_gamma_distribution_for_single_alpha(
-            alpha, y_num_list, n_points=n_points
+            alpha,
+            y_num_list,
+            n_points=n_points,
+            is_with_lower_bound=is_with_lower_bound,
         )
     )
     df = pd.DataFrame(

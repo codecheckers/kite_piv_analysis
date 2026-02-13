@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
-from utils import reading_optimal_bound_placement
-from utils import project_dir
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis.utils import project_dir
 
 
 import pandas as pd

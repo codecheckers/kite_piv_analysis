@@ -1,5 +1,5 @@
-from plotting import *
-from plot_styling import set_plot_style
+from kite_piv_analysis.plotting import *
+from kite_piv_analysis.plot_styling import set_plot_style
 
 
 def normal_masked_interpolated(plot_params: dict) -> None:
@@ -122,7 +122,7 @@ def normal_masked_interpolated(plot_params: dict) -> None:
                 # f'PIV Masked for {plot_params["column_to_mask"]} in bounds {plot_params["mask_lower_bound"]} to {plot_params["mask_upper_bound"]}'
                 f"PIV Masked"
             )
-            axes[i, 2].set_title(f"PIV Masked \& Interpolated")
+            axes[i, 2].set_title(r"PIV Masked \& Interpolated")
             # if plot_params["is_with_cbar"]:
         #     add_colorbar(fig, axes[i, 2], plot_params)
 

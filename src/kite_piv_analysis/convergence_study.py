@@ -3,16 +3,16 @@ import pandas as pd
 from pathlib import Path
 from typing import Union, List, Tuple, Dict, Optional
 from dataclasses import dataclass, field
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from utils import project_dir
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.utils import project_dir
 from typing import List, Dict, Any, Optional
-from plot_styling import set_plot_style, plot_on_ax
+from kite_piv_analysis.plot_styling import set_plot_style, plot_on_ax
 import matplotlib.pyplot as plt
-import calculating_airfoil_centre
-from plotting import *
-from utils import reading_optimal_bound_placement
-import calculating_circulation
+from kite_piv_analysis import calculating_airfoil_centre
+from kite_piv_analysis.plotting import *
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis import calculating_circulation
 
 
 @dataclass

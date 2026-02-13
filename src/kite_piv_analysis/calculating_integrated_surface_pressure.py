@@ -4,7 +4,7 @@ import os
 import scipy.interpolate as interpolate
 from scipy.interpolate import griddata
 from pathlib import Path
-from utils import project_dir, interp2d_batch, csv_reader
+from kite_piv_analysis.utils import project_dir, interp2d_batch, csv_reader
 import matplotlib.pyplot as plt
 
 
@@ -81,10 +81,10 @@ def running_NOCA(
     U_inf: float = 15,
 ):
 
-    import calculating_airfoil_centre
-    import force_from_noca
-    from utils import reading_optimal_bound_placement
-    from defining_bound_volume import boundary_ellipse, boundary_rectangle
+    from kite_piv_analysis import calculating_airfoil_centre
+    from kite_piv_analysis import force_from_noca
+    from kite_piv_analysis.utils import reading_optimal_bound_placement
+    from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
 
     x_airfoil, y_airfoil, chord = calculating_airfoil_centre.main(
         alpha, y_num, is_with_chord=True
@@ -252,9 +252,9 @@ def compute_surface_forces(
 
 def main():
 
-    import plotting
-    from transforming_paraview_output import process_csv
-    import calculating_airfoil_centre
+    from kite_piv_analysis import plotting
+    from kite_piv_analysis.transforming_paraview_output import process_csv
+    from kite_piv_analysis import calculating_airfoil_centre
 
     # slices_folder = Path(project_dir) / "data" / "CFD_slices" / f"alpha_{alpha}"
     # f"/home/jellepoland/ownCloud/phd/data/V3A/Lebesque_folder/results/1e6/{alpha}/slices"

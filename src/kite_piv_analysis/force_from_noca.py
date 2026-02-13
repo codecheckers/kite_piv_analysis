@@ -2,8 +2,8 @@ import numpy as np
 from pathlib import Path
 import pandas as pd
 from scipy.signal import convolve2d
-from utils import project_dir, reshape_remove_nans, interp2d_batch, csv_reader
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis.utils import project_dir, reshape_remove_nans, interp2d_batch, csv_reader
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
 
 
 def matlab_values():
@@ -597,8 +597,8 @@ def extracting_fx_fy_cl_cd(
     velocity_scale: float = 15,
 ):
     from force_from_pressure import process_csv
-    import calculating_airfoil_centre
-    from utils import reading_optimal_bound_placement
+    from kite_piv_analysis import calculating_airfoil_centre
+    from kite_piv_analysis.utils import reading_optimal_bound_placement
 
     # Reading in the airfoil centers
     x_airfoil, y_airfoil, chord = calculating_airfoil_centre.main(

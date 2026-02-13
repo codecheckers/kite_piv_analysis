@@ -84,11 +84,12 @@ dependencies = [
   "numpy", 
   "pandas>=1.5.3", 
   "matplotlib>=3.7.1",
+  "cycler",
   "xarray>=2024.6.0",
   "netCDF4",
   "scipy",
   "openpyxl",
-  "VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.0.3",
+  "VSM @ git+https://github.com/awegroup/Vortex-Step-Method.git@v2.1.0",
 ]
 
 # You can define additional groups of dependencies here (e.g., development dependencies).

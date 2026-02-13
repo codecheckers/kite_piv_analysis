@@ -10,13 +10,13 @@ from pathlib import Path
 import pandas as pd
 import os
 from typing import TypedDict, Optional
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 from io import StringIO
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from calculating_circulation import calculate_circulation
-import extract_spanwise_contour
-from plotting import *
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.calculating_circulation import calculate_circulation
+from kite_piv_analysis import extract_spanwise_contour
+from kite_piv_analysis.plotting import *
 
 
 def scaling_velocity(data_array, headers, vel_scaling=15):
@@ -317,7 +317,7 @@ def plot_contour_with_colored_data(plot_params, mask_bound=3):
 
 
 def main():
-    from plot_styling import set_plot_style
+    from kite_piv_analysis.plot_styling import set_plot_style
 
     set_plot_style()
 

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import random
 from pathlib import Path
 import numpy as np
-from utils import project_dir
-from plot_styling import set_plot_style, plot_on_ax
+from kite_piv_analysis.utils import project_dir
+from kite_piv_analysis.plot_styling import set_plot_style, plot_on_ax
 
 
 def read_single_dat_file_into_df(file_path):
@@ -407,7 +407,7 @@ def plot_convergence(variable, values_at_point_list, point_coords, V_values):
 
 
 # Example usage
-if __name__ == "__main__":
+def main():
     # Example coordinates for the point of interest
     point_coords = (-0.75368, -118.177)  # in free-stream, looks good
 
@@ -416,3 +416,7 @@ if __name__ == "__main__":
 
     # Plot convergence for Y4 (left = raw, right = filtered)
     plot_convergence("V", values, point_coords, V_values)
+
+
+if __name__ == "__main__":
+    main()

@@ -5,7 +5,17 @@ from scipy.interpolate import (
     LinearNDInterpolator,
 )
 
-project_dir = Path(__file__).resolve().parent.parent
+# Resolve repository root after moving code into src/kite_piv_analysis.
+_this_file = Path(__file__).resolve()
+_candidate_roots = [_this_file.parents[i] for i in range(min(6, len(_this_file.parents)))]
+project_dir = None
+for _root in _candidate_roots:
+    if (_root / "data").exists() and (_root / "processed_data").exists():
+        project_dir = _root
+        break
+if project_dir is None:
+    # Fallback to repository root layout: <repo>/src/kite_piv_analysis/utils.py
+    project_dir = _this_file.parents[2]
 
 
 def reshape_remove_nans(col, n_rows, n_cols):

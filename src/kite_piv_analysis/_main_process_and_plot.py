@@ -2,14 +2,34 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import os
 import shutil
+import sys
 from contextlib import contextmanager
 from pathlib import Path
 
-from utils import project_dir
+import pandas as pd
+
+# Support both:
+# 1) python -m kite_piv_analysis._main_process_and_plot
+# 2) python src/kite_piv_analysis/_main_process_and_plot.py
+try:
+    from kite_piv_analysis.utils import project_dir
+except ModuleNotFoundError:
+    src_root = Path(__file__).resolve().parents[1]
+    if str(src_root) not in sys.path:
+        sys.path.insert(0, str(src_root))
+    from kite_piv_analysis.utils import project_dir
 
 
 PROJECT_DIR = Path(project_dir)
+BASE_PACKAGE = __package__ or "kite_piv_analysis"
+
+# Ensure matplotlib cache is writable (some systems have a non-writable ~/.cache).
+if "MPLCONFIGDIR" not in os.environ:
+    mpl_cache_dir = PROJECT_DIR / ".cache" / "matplotlib"
+    mpl_cache_dir.mkdir(parents=True, exist_ok=True)
+    os.environ["MPLCONFIGDIR"] = str(mpl_cache_dir)
 
 # fig05 script is currently not present in scripts/
 PLOT_MODULES = [
@@ -25,6 +45,27 @@ PLOT_MODULES = [
     "fig14_convergence_250im_uvw",
     "fig15_line_interference_PIV",
 ]
+
+SMOKE_PLOT_MODULES = ["fig04_plane_location"]
+
+FULL_CONVERGENCE_PAIRS = [(6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (16, 1)]
+SMOKE_CONVERGENCE_PAIRS = [(6, 1)]
+
+FULL_PARAMETER_NAMES = ["iP", "dLx", "dLy"]
+SMOKE_PARAMETER_NAMES = ["iP"]
+
+FULL_FAST_FACTOR = 10
+SMOKE_FAST_FACTOR = 50
+
+FULL_SWEEP_N_POINTS = 2  # TODO: should be 10 -please revert back
+SMOKE_SWEEP_N_POINTS = 2
+
+FULL_GAMMA_Y_NUM_LIST = [1, 2, 3, 4, 5, 6, 7]
+SMOKE_GAMMA_Y_NUM_LIST = [1]
+
+
+def _import_package_module(module_name: str):
+    return importlib.import_module(f"{BASE_PACKAGE}.{module_name}")
 
 
 def processed_cfd_path(alpha: int, y_num: int) -> Path:
@@ -67,11 +108,16 @@ def spanwise_outline_data_path(alpha: int, cm_offset: int) -> Path:
     )
 
 
-def convergence_paths(alpha: int, y_num: int) -> list[Path]:
+def convergence_paths(
+    alpha: int, y_num: int, parameter_names: list[str] | None = None
+) -> list[Path]:
+    if parameter_names is None:
+        parameter_names = FULL_PARAMETER_NAMES
+
     files: list[Path] = []
     for data_type in ["CFD", "PIV"]:
         for shape in ["Ellipse", "Rectangle"]:
-            for parameter in ["iP", "dLx", "dLy"]:
+            for parameter in parameter_names:
                 files.append(
                     PROJECT_DIR
                     / "processed_data"
@@ -95,7 +141,11 @@ def convergence_paths(alpha: int, y_num: int) -> list[Path]:
     return files
 
 
-def required_processed_cfd_files() -> list[Path]:
+def required_processed_cfd_files(smoke: bool = False) -> list[Path]:
+    if smoke:
+        # Minimal CFD cache required for smoke computations.
+        return [processed_cfd_path(6, 1)]
+
     files: list[Path] = []
     for y_num in range(1, 8):
         files.append(processed_cfd_path(6, y_num))
@@ -104,18 +154,22 @@ def required_processed_cfd_files() -> list[Path]:
     return files
 
 
-def required_source_files() -> list[Path]:
+def required_source_files(smoke: bool = False) -> list[Path]:
     files: list[Path] = []
 
-    # PIV stitched input used by fig06/07/10/12/13/15
-    for y_num in range(1, 8):
-        files.append(piv_stitched_path(13, y_num))
-    for y_num in range(1, 5):
-        files.append(piv_stitched_path(23, y_num))
+    if smoke:
+        files.append(piv_stitched_path(13, 1))
+    else:
+        # PIV stitched input used by fig06/07/10/12/13/15
+        for y_num in range(1, 8):
+            files.append(piv_stitched_path(13, y_num))
+        for y_num in range(1, 5):
+            files.append(piv_stitched_path(23, y_num))
 
     # Airfoil and bound placement data used by plotting helpers
     files.append(PROJECT_DIR / "data" / "airfoils" / "airfoil_translation_values.csv")
-    for y_num in range(1, 8):
+    airfoil_y_nums = [1] if smoke else range(1, 8)
+    for y_num in airfoil_y_nums:
         files.append(PROJECT_DIR / "data" / "airfoils" / f"y{y_num}.dat")
     files.append(PROJECT_DIR / "data" / "optimal_bound_placement.csv")
 
@@ -123,14 +177,20 @@ def required_source_files() -> list[Path]:
     files.append(PROJECT_DIR / "data" / "gamma_distribution" / "y_locations.csv")
 
     # Spanwise raw source data used to generate missing outlines
-    for cm_offset in [10, 15, 20, 25, 30]:
-        files.append(spanwise_raw_path(6, cm_offset))
-    files.append(spanwise_raw_path(16, 25))
+    if smoke:
+        files.append(spanwise_raw_path(6, 25))
+    else:
+        for cm_offset in [10, 15, 20, 25, 30]:
+            files.append(spanwise_raw_path(6, cm_offset))
+        files.append(spanwise_raw_path(16, 25))
 
     return files
 
 
-def required_spanwise_outline_files() -> list[Path]:
+def required_spanwise_outline_files(smoke: bool = False) -> list[Path]:
+    if smoke:
+        return [spanwise_outline_data_path(6, 25)]
+
     files: list[Path] = []
     for cm_offset in [10, 15, 20, 25, 30]:
         files.append(spanwise_outline_data_path(6, cm_offset))
@@ -167,17 +227,18 @@ def ensure_result_directories() -> None:
         )
 
 
-def validate_source_data() -> None:
-    missing = missing_paths(required_source_files())
+def validate_source_data(smoke: bool = False) -> None:
+    missing = missing_paths(required_source_files(smoke=smoke))
 
-    raw_dat_dir = (
-        PROJECT_DIR
-        / "data"
-        / "raw_dat_files_convergence"
-        / "flipped_aoa_23_vw_15_H_918_Z1_Y4_X2"
-    )
-    if not raw_dat_dir.exists() or not any(raw_dat_dir.glob("*.dat")):
-        missing.append(raw_dat_dir)
+    if not smoke:
+        raw_dat_dir = (
+            PROJECT_DIR
+            / "data"
+            / "raw_dat_files_convergence"
+            / "flipped_aoa_23_vw_15_H_918_Z1_Y4_X2"
+        )
+        if not raw_dat_dir.exists() or not any(raw_dat_dir.glob("*.dat")):
+            missing.append(raw_dat_dir)
 
     if missing:
         formatted = "\n".join(f"  - {path}" for path in missing)
@@ -186,8 +247,39 @@ def validate_source_data() -> None:
         )
 
 
-def ensure_processed_cfd() -> None:
-    required = required_processed_cfd_files()
+def _generate_processed_cfd_subset(cases: list[tuple[int, int]]) -> None:
+    transforming_paraview_output = _import_package_module(
+        "transforming_paraview_output"
+    )
+    for alpha, y_num in cases:
+        input_dir = PROJECT_DIR / "data" / "CFD_slices" / f"alpha_{alpha}"
+        candidates = sorted(
+            [
+                path
+                for path in input_dir.glob(f"Y{y_num}_*.csv")
+                if not path.name.endswith("_0.csv")
+            ]
+        )
+        if not candidates:
+            raise FileNotFoundError(
+                f"Cannot generate processed CFD for alpha={alpha}, Y={y_num}; "
+                f"no matching input in {input_dir}"
+            )
+
+        output_path = processed_cfd_path(alpha, y_num)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        transforming_paraview_output.process_csv(
+            input_path=candidates[0],
+            output_path=output_path,
+            spatial_scale=2.584,
+            velocity_scale=15,
+            y_num=y_num,
+            alpha=alpha,
+        )
+
+
+def ensure_processed_cfd(smoke: bool = False) -> None:
+    required = required_processed_cfd_files(smoke=smoke)
     missing_before = missing_paths(required)
     if not missing_before:
         print("Processed CFD files already available.")
@@ -196,9 +288,13 @@ def ensure_processed_cfd() -> None:
     print(
         f"Generating missing processed CFD files ({len(missing_before)} missing before run)..."
     )
-    import transforming_paraview_output
-
-    transforming_paraview_output.main()
+    if smoke:
+        _generate_processed_cfd_subset(cases=[(6, 1)])
+    else:
+        transforming_paraview_output = _import_package_module(
+            "transforming_paraview_output"
+        )
+        transforming_paraview_output.main()
 
     missing_after = missing_paths(required)
     if missing_after:
@@ -221,14 +317,17 @@ def _suppress_matplotlib_show():
         plt.show = original_show
 
 
-def ensure_spanwise_outlines() -> None:
-    missing = missing_paths(required_spanwise_outline_files())
+def ensure_spanwise_outlines(smoke: bool = False) -> None:
+    required = required_spanwise_outline_files(smoke=smoke)
+    missing = missing_paths(required)
     if not missing:
         print("Spanwise outline files already available.")
         return
 
-    print(f"Generating missing spanwise outlines ({len(missing)} missing before run)...")
-    import extract_spanwise_contour
+    print(
+        f"Generating missing spanwise outlines ({len(missing)} missing before run)..."
+    )
+    extract_spanwise_contour = _import_package_module("extract_spanwise_contour")
 
     for data_outline_path in missing:
         stem = data_outline_path.stem  # alpha_6_CFD_25cm_outline_wing
@@ -253,48 +352,82 @@ def ensure_spanwise_outlines() -> None:
 
         generated_path = Path(generated_path)
         if not generated_path.exists():
-            raise RuntimeError(f"Outline generation returned missing file: {generated_path}")
+            raise RuntimeError(
+                f"Outline generation returned missing file: {generated_path}"
+            )
 
         shutil.copy2(generated_path, data_outline_path)
         print(f"Generated: {data_outline_path}")
 
-    missing_after = missing_paths(required_spanwise_outline_files())
+    missing_after = missing_paths(required)
     if missing_after:
         formatted = "\n".join(f"  - {path}" for path in missing_after)
         raise RuntimeError(
-            "Could not generate all spanwise outline files. Still missing:\n" + formatted
+            "Could not generate all spanwise outline files. Still missing:\n"
+            + formatted
         )
     print("Spanwise outline files generated.")
 
 
-def ensure_quantitative_gamma_file() -> None:
+def _quantitative_file_has_y_nums(csv_path: Path, y_num_list: list[int]) -> bool:
+    if not csv_path.exists():
+        return False
+    try:
+        df = pd.read_csv(csv_path)
+    except Exception:
+        return False
+    if "y_num" not in df.columns:
+        return False
+    observed = set(pd.to_numeric(df["y_num"], errors="coerce").dropna().astype(int))
+    return set(y_num_list).issubset(observed)
+
+
+def ensure_quantitative_gamma_file(smoke: bool = False) -> None:
     target = (
-        PROJECT_DIR / "processed_data" / "quantitative_chordwise_analysis_alpha_6_with_std.csv"
+        PROJECT_DIR
+        / "processed_data"
+        / "quantitative_chordwise_analysis_alpha_6_with_std.csv"
     )
-    if target.exists():
+    y_num_list = SMOKE_GAMMA_Y_NUM_LIST if smoke else FULL_GAMMA_Y_NUM_LIST
+    n_points = SMOKE_SWEEP_N_POINTS if smoke else FULL_SWEEP_N_POINTS
+
+    if _quantitative_file_has_y_nums(target, y_num_list):
         print("Quantitative chordwise analysis file already available.")
         return
 
-    print("Generating quantitative chordwise analysis (alpha=6, Y1-Y7)...")
-    import calculating_noca_and_kutta
+    print(
+        f"Generating quantitative chordwise analysis (alpha=6, Y={y_num_list}, n_points={n_points})..."
+    )
+    calculating_noca_and_kutta = _import_package_module("calculating_noca_and_kutta")
 
     calculating_noca_and_kutta.save_results_single_alpha(
         alpha=6,
-        y_num_list=[1, 2, 3, 4, 5, 6, 7],
+        y_num_list=y_num_list,
+        n_points=n_points,
+        is_with_lower_bound=not smoke,
     )
-    if not target.exists():
+    if not _quantitative_file_has_y_nums(target, y_num_list):
         raise RuntimeError(f"Failed to generate required file: {target}")
     print(f"Generated: {target}")
 
 
-def ensure_vsm_gamma_cache() -> None:
-    target = PROJECT_DIR / "processed_data" / "gamma_distribution" / "VSM_gamma_distribution.csv"
+def ensure_vsm_gamma_cache(smoke: bool = False) -> None:
+    if smoke:
+        print("Skipping VSM gamma cache generation in smoke mode.")
+        return
+
+    target = (
+        PROJECT_DIR
+        / "processed_data"
+        / "gamma_distribution"
+        / "VSM_gamma_distribution.csv"
+    )
     if target.exists():
         print("VSM gamma cache already available.")
         return
 
     print("Generating VSM gamma cache...")
-    import fig08_gamma_distribution
+    fig08_gamma_distribution = _import_package_module("fig08_gamma_distribution")
 
     fig08_gamma_distribution.get_VSM_gamma_distribution()
     if not target.exists():
@@ -302,11 +435,15 @@ def ensure_vsm_gamma_cache() -> None:
     print(f"Generated: {target}")
 
 
-def ensure_convergence_cache() -> None:
-    required_pairs = [(6, 1), (6, 2), (6, 3), (6, 4), (6, 5), (16, 1)]
+def ensure_convergence_cache(smoke: bool = False) -> None:
+    required_pairs = SMOKE_CONVERGENCE_PAIRS if smoke else FULL_CONVERGENCE_PAIRS
+    parameter_names = SMOKE_PARAMETER_NAMES if smoke else FULL_PARAMETER_NAMES
+    fast_factor = SMOKE_FAST_FACTOR if smoke else FULL_FAST_FACTOR
+    sweep_n_points = SMOKE_SWEEP_N_POINTS if smoke else FULL_SWEEP_N_POINTS
+
     missing_pairs: list[tuple[int, int]] = []
     for alpha, y_num in required_pairs:
-        pair_missing = missing_paths(convergence_paths(alpha, y_num))
+        pair_missing = missing_paths(convergence_paths(alpha, y_num, parameter_names))
         if pair_missing:
             missing_pairs.append((alpha, y_num))
 
@@ -315,10 +452,7 @@ def ensure_convergence_cache() -> None:
         return
 
     print(f"Generating convergence cache for {len(missing_pairs)} alpha/Y pairs...")
-    import fig13_convergence_study
-
-    parameter_names = ["iP", "dLx", "dLy"]
-    fast_factor = 25
+    fig13_convergence_study = _import_package_module("fig13_convergence_study")
 
     for alpha, y_num in missing_pairs:
         print(f"  - alpha={alpha}, Y={y_num}")
@@ -331,27 +465,32 @@ def ensure_convergence_cache() -> None:
         fig13_convergence_study.storing_PIV_percentage_sweep(
             alpha=alpha,
             y_num=y_num,
-            n_points=10,
+            n_points=sweep_n_points,
+            fast_factor=fast_factor,
         )
 
     missing_after: list[Path] = []
     for alpha, y_num in required_pairs:
-        missing_after.extend(missing_paths(convergence_paths(alpha, y_num)))
+        missing_after.extend(
+            missing_paths(convergence_paths(alpha, y_num, parameter_names))
+        )
     if missing_after:
         formatted = "\n".join(f"  - {path}" for path in missing_after)
         raise RuntimeError(
-            "Could not generate all convergence cache files. Still missing:\n" + formatted
+            "Could not generate all convergence cache files. Still missing:\n"
+            + formatted
         )
     print("Convergence cache files generated.")
 
 
-def run_plot_scripts() -> None:
+def run_plot_scripts(smoke: bool = False) -> None:
+    modules_to_run = SMOKE_PLOT_MODULES if smoke else PLOT_MODULES
     print("Running plot scripts for fig04 and fig06-fig15 (fig05 not present)...")
     failures: list[tuple[str, Exception]] = []
-    for module_name in PLOT_MODULES:
+    for module_name in modules_to_run:
         print(f"  - {module_name}.main()")
         try:
-            module = importlib.import_module(module_name)
+            module = _import_package_module(module_name)
             if not hasattr(module, "main"):
                 raise AttributeError(f"Module has no main(): {module_name}")
             module.main()
@@ -367,19 +506,32 @@ def run_plot_scripts() -> None:
     print("All requested figure scripts completed.")
 
 
-def main(run_plots: bool = True) -> None:
+def main(
+    run_plots: bool = True, smoke: bool = False, skip_process: bool = False
+) -> None:
     print("Starting dependency-aware processing pipeline...")
-    ensure_result_directories()
-    validate_source_data()
+    if smoke and not skip_process:
+        print(
+            "Smoke mode enabled: reduced workload "
+            "(n_points=2, y_num_list=[1], reduced convergence sweep)."
+        )
+    if skip_process:
+        print(
+            "Skipping processing stage (--skip-process). "
+            "Only plotting fig04 and fig06-fig15."
+        )
+    else:
+        ensure_result_directories()
+        validate_source_data(smoke=smoke)
 
-    ensure_processed_cfd()
-    ensure_spanwise_outlines()
-    ensure_quantitative_gamma_file()
-    ensure_convergence_cache()
-    ensure_vsm_gamma_cache()
+        ensure_processed_cfd(smoke=smoke)
+        ensure_spanwise_outlines(smoke=smoke)
+        ensure_quantitative_gamma_file(smoke=smoke)
+        ensure_convergence_cache(smoke=smoke)
+        ensure_vsm_gamma_cache(smoke=smoke)
 
     if run_plots:
-        run_plot_scripts()
+        run_plot_scripts(smoke=(smoke and not skip_process))
     else:
         print("Skipping plot execution (--skip-plots).")
 
@@ -395,5 +547,19 @@ if __name__ == "__main__":
         action="store_true",
         help="Only generate/check dependencies; do not run figure scripts.",
     )
+    parser.add_argument(
+        "--smoke",
+        action="store_true",
+        help="Run a reduced-fidelity pipeline for quick error checking.",
+    )
+    parser.add_argument(
+        "--skip-process",
+        action="store_true",
+        help="Skip preprocessing/cache generation and only run plotting (fig04 and fig06-fig15).",
+    )
     args = parser.parse_args()
-    main(run_plots=not args.skip_plots)
+    main(
+        run_plots=not args.skip_plots,
+        smoke=args.smoke,
+        skip_process=args.skip_process,
+    )

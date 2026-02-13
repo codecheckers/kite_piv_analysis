@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import extract_spanwise_contour
-from plot_styling import set_plot_style, plot_on_ax
+from kite_piv_analysis import extract_spanwise_contour
+from kite_piv_analysis.plot_styling import set_plot_style, plot_on_ax
 import numpy as np
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 from pathlib import Path
 
 
@@ -111,8 +111,7 @@ def plot_spanwise_contour(curr_plot_params):
     return ax
 
 
-# Example usage
-if __name__ == "__main__":
+def main():
     plot_params = {
         "alpha": 6,
         "xlim": (-0.1, 0.75),
@@ -120,4 +119,9 @@ if __name__ == "__main__":
         "save_dir": Path(project_dir, "results", "paper_plots_21_10_2025"),
     }
     plot_spanwise_contour(plot_params)
+
+
+# Example usage
+if __name__ == "__main__":
+    main()
     # plt.show()

@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.interpolate import griddata
 import pandas as pd
-from defining_bound_volume import boundary_rectangle
-from utils import reading_optimal_bound_placement
-import calculating_airfoil_centre
+from kite_piv_analysis.defining_bound_volume import boundary_rectangle
+from kite_piv_analysis.utils import reading_optimal_bound_placement
+from kite_piv_analysis import calculating_airfoil_centre
 
 
 def inverse_distance_weighting(points, values, grid_points, power=2):

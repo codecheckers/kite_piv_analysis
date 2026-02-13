@@ -10,14 +10,14 @@ from pathlib import Path
 import pandas as pd
 import os
 from typing import TypedDict, Optional
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 from io import StringIO
-from defining_bound_volume import boundary_ellipse, boundary_rectangle
-import force_from_noca
-from calculating_circulation import calculate_circulation
-import extract_spanwise_contour
-import transforming_paraview_output
-from plotting import *
+from kite_piv_analysis.defining_bound_volume import boundary_ellipse, boundary_rectangle
+from kite_piv_analysis import force_from_noca
+from kite_piv_analysis.calculating_circulation import calculate_circulation
+from kite_piv_analysis import extract_spanwise_contour
+from kite_piv_analysis import transforming_paraview_output
+from kite_piv_analysis.plotting import *
 
 
 def transform_raw_csv_to_processed_df(alpha=6, x_cm=25) -> pd.DataFrame:
@@ -591,7 +591,7 @@ def plot_contour_with_colored_data_two_rows_three_cols(plot_params):
 
 
 def main():
-    from plot_styling import set_plot_style
+    from kite_piv_analysis.plot_styling import set_plot_style
 
     set_plot_style()
 

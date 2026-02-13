@@ -18,13 +18,13 @@ from functools import lru_cache
 import hashlib
 import pickle
 
-from utils import project_dir
+from kite_piv_analysis.utils import project_dir
 import csv
-from compute_overlap_error import (
+from kite_piv_analysis.compute_overlap_error import (
     load_dat_file_with_std,
     interpolate_to_grid,
 )
-from compute_overlap_error_suction_side_plot import (
+from kite_piv_analysis.compute_overlap_error_suction_side_plot import (
     print_stitching_uncertainty_table_flipped,
 )
 
@@ -44,7 +44,7 @@ def load_base_offsets_from_csv(aoa, y_num):
     """
     csv_path = (
         Path(project_dir)
-        / "ALL_ERIK_FILES"
+        / "data_ALL_ERIK_FILES"
         / "JelleStitching"
         / "Input"
         / "planes_location.csv"
@@ -79,7 +79,7 @@ def offsets_dict_from_csv(aoa, y_num):
     """
     csv_path = (
         Path(project_dir)
-        / "ALL_ERIK_FILES"
+        / "data_ALL_ERIK_FILES"
         / "JelleStitching"
         / "Input"
         / "planes_location.csv"
@@ -112,7 +112,7 @@ def write_offsets_to_csv(aoa, y_num, dx_n, dx_f, dy_f, base_offsets):
     """
     csv_path = (
         Path(project_dir)
-        / "ALL_ERIK_FILES"
+        / "data_ALL_ERIK_FILES"
         / "JelleStitching"
         / "Input"
         / "planes_location.csv"
@@ -155,7 +155,7 @@ def load_raw_data_cached(aoa=23, y_num=1):
     if cache_key in _RAW_DATA_CACHE:
         return _RAW_DATA_CACHE[cache_key]
 
-    input_dir = Path(project_dir) / "ALL_ERIK_FILES" / "JelleStitching" / "Input"
+    input_dir = Path(project_dir) / "data_ALL_ERIK_FILES" / "JelleStitching" / "Input"
     U_inf = 15.0
     std_threshold = 0.1
 
