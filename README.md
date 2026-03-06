@@ -1,9 +1,16 @@
 <!-- [![CODECHECK](https://codecheck.org.uk/img/codeworks-badge.svg)](https://doi.org/10.5281/zenodo.15603144) -->
 
-# Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry
+# CODECHECK Repository
+
+This is the CODECHECK repository for the publication: [Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry](https://doi.org/10.5194/wes-2025-217). It is forked from the author's repository associated with the publication.
+
+The reproduced figures can be found in the codecheck/outputs directory.
+
+
+## Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry
 This repository contains code that generates the figures a paper, titled: ["Flow Field Analysis of a Leading-Edge Inflatable Kite Rigid Scale Model Using Stereoscopic Particle Image Velocimetry"](https://wes.copernicus.org/preprints/wes-2025-217/wes-2025-217.pdf) published open-access in Wind Energy Science.
 
-## Usage instructions
+### Usage instructions
 1. Install the repository:
    Linux: 
     ```bash
@@ -30,7 +37,7 @@ This repository contains code that generates the figures a paper, titled: ["Flow
     python ./src/kite_piv_analysis/_main_process_and_plot.py
     ```
 
-### Requirements
+#### Requirements
 
 Automatically installed via `pip install -e .[dev]`:
 
@@ -46,14 +53,14 @@ Needs to be installed separately:
 - **Data**: The data required to generate the figures is not included in this repository due to size constraints. It can be downloaded from [Zenodo](https://doi.org/10.5281/zenodo.17395913) and should be placed inside the `data/` folder.
 - **Python**: Python 3.8 or higher is recommended for running the code.
 
-## Citation
+### Citation
 If you use this project in your research, please consider citing it. 
 Citation details can be found in the [CITATION.cff](CITATION.cff) file included in this repository.
 
-## License
+### License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## :warning: License and Waiver
+### :warning: License and Waiver
 
 Specify the license under which your software is distributed and include the copyright notice:
 
